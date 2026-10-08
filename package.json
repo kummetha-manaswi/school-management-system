@@ -1,0 +1,23 @@
+{
+  "name": "school-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Centralized School Management System for Academic and Operations workflows",
+  "scripts": {
+    "dev:backend": "npm.cmd --prefix backend run dev",
+    "dev:frontend": "npm.cmd --prefix frontend run dev",
+    "dev:mobile": "npm.cmd --prefix mobile run start",
+    "build:frontend": "npm.cmd --prefix frontend run build",
+    "install:all": "npm.cmd install && npm.cmd --prefix backend install && npm.cmd --prefix frontend install && npm.cmd --prefix mobile install"
+  },
+  "keywords": [
+    "school-management",
+    "react",
+    "express",
+    "react-native",
+    "expo",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC"
+}
