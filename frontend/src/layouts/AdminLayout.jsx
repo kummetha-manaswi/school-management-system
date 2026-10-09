@@ -20,8 +20,8 @@ export const AdminLayout = () => {
   const location = useLocation();
 
   const academicItems = [
-    { label: 'Student Management', icon: Users, status: 'Planned' },
-    { label: 'Teacher Management', icon: GraduationCap, status: 'Planned' },
+    { label: 'Student Management', icon: Users, path: '/academic/students', status: 'Active' },
+    { label: 'Teacher Management', icon: GraduationCap, path: '/academic/teachers', status: 'Active' },
     { label: 'Attendance', icon: Calendar, status: 'Planned' },
     { label: 'Assignments', icon: BookOpen, status: 'Planned' },
     { label: 'Exams & Results', icon: Award, status: 'Planned' },
@@ -81,15 +81,38 @@ export const AdminLayout = () => {
             <ul className="space-y-1">
               {academicItems.map((item) => (
                 <li key={item.label}>
-                  <div className="flex items-center justify-between px-3 py-1.5 rounded-md text-xs text-slate-400 hover:text-slate-300 hover:bg-slate-800/60 cursor-not-allowed">
-                    <div className="flex items-center space-x-2.5">
-                      <item.icon className="w-4 h-4 text-slate-500" />
-                      <span>{item.label}</span>
+                  {item.path ? (
+                    <Link
+                      to={item.path}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                        location.pathname.startsWith(item.path)
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2.5">
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </div>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+                        location.pathname.startsWith(item.path)
+                          ? 'bg-indigo-800 text-indigo-100'
+                          : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-between px-3 py-1.5 rounded-md text-xs text-slate-400 hover:text-slate-300 hover:bg-slate-800/60 cursor-not-allowed">
+                      <div className="flex items-center space-x-2.5">
+                        <item.icon className="w-4 h-4 text-slate-500" />
+                        <span>{item.label}</span>
+                      </div>
+                      <span className="text-[10px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">
+                        {item.status}
+                      </span>
                     </div>
-                    <span className="text-[10px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">
-                      {item.status}
-                    </span>
-                  </div>
+                  )}
                 </li>
               ))}
             </ul>

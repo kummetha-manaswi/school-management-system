@@ -1,26 +1,26 @@
 const express = require('express');
+const studentRoutes = require('./student.routes');
+const teacherRoutes = require('./teacher.routes');
 
 const router = express.Router();
 
 /**
  * Developer 1: Academic & Parent Domain Route Mount Point
- * 
- * Future business sub-routes:
- * - /students
- * - /teachers
- * - /attendance
- * - /assignments
- * - /exams
- * - /results
- * - /teacher-notes
- * - /parent-portal
  */
 
+// Student Management routes: /api/academic/students
+router.use('/students', studentRoutes);
+
+// Teacher Management routes: /api/academic/teachers
+router.use('/teachers', teacherRoutes);
+
+// Academic domain status
 router.get('/status', (req, res) => {
   res.status(200).json({
     module: 'academic',
-    status: 'initialized',
-    message: 'Academic & Parent module foundation ready',
+    status: 'active',
+    submodules: ['students', 'teachers'],
+    message: 'Academic & Parent module online',
   });
 });
 
