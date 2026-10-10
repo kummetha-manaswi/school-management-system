@@ -13,19 +13,24 @@ import {
   CreditCard, 
   Package, 
   ShieldCheck, 
-  LayoutDashboard
+  LayoutDashboard,
+  LogOut,
+  HeartHandshake
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const AdminLayout = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const academicItems = [
     { label: 'Student Management', icon: Users, path: '/academic/students', status: 'Active' },
     { label: 'Teacher Management', icon: GraduationCap, path: '/academic/teachers', status: 'Active' },
-    { label: 'Attendance', icon: Calendar, status: 'Planned' },
-    { label: 'Assignments', icon: BookOpen, status: 'Planned' },
-    { label: 'Exams & Results', icon: Award, status: 'Planned' },
-    { label: 'Teacher Notes', icon: FileText, status: 'Planned' },
+    { label: 'Parent Management', icon: HeartHandshake, path: '/academic/parents', status: 'Active' },
+    { label: 'Attendance', icon: Calendar, path: '/academic/attendance', status: 'Active' },
+    { label: 'Assignments', icon: BookOpen, path: '/academic/assignments', status: 'Active' },
+    { label: 'Exams & Results', icon: Award, path: '/academic/exams', status: 'Active' },
+    { label: 'Teacher Notes', icon: FileText, path: '/academic/notes', status: 'Active' },
   ];
 
   const operationsItems = [
@@ -168,10 +173,37 @@ export const AdminLayout = () => {
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-mono">Client: React 18 + Vite</span>
-            </div>
+            {user && (
+              <div className="flex items-center space-x-3 border-r border-slate-200 pr-4">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shadow-inner">
+                  {user.name ? user.name.charAt(0) : 'U'}
+                </div>
+                <div className="text-left hidden sm:block">
+                  <div className="text-xs font-semibold text-slate-800 leading-tight">
+                    {user.name || user.email}
+                  </div>
+                  <div className="flex items-center space-x-1.5 mt-0.5">
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold uppercase tracking-wider ${
+                      user.role === 'admin'
+                        ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
+                        : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                    }`}>
+                      {user.role}
+                    </span>
+                    <span className="text-[11px] text-slate-400 truncate max-w-[150px]">{user.email}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={logout}
+              title="Sign out of staff portal"
+              className="flex items-center space-x-1.5 text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 transition font-medium cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
           </div>
         </header>
 

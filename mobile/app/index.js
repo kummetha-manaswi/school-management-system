@@ -1,5 +1,5 @@
 /**
- * Mobile Navigation & Screen Root Placeholder
- * Screen modules for Parent, Staff, and Worker flows will be registered here.
+ * Mobile Navigation & Screen Root
+ * Screen modules for Parent, Staff, and Worker flows.
  */
-export {};
+export { default } from '../App';

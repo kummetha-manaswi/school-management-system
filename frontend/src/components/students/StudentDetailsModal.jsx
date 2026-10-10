@@ -9,11 +9,18 @@ import {
   Calendar, 
   Heart, 
   Users, 
-  Edit 
+  Edit,
+  ShieldCheck,
+  CheckCircle2,
+  Clock,
+  ExternalLink
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStudentParents } from '../../hooks/useParents';
 
 export const StudentDetailsModal = ({ isOpen, onClose, student }) => {
+  const { data: linkedParents, isLoading: isLoadingParents } = useStudentParents(student?._id);
+
   if (!isOpen || !student) return null;
 
   const formatDate = (dateStr) => {
@@ -135,24 +142,105 @@ export const StudentDetailsModal = ({ isOpen, onClose, student }) => {
           </div>
 
           {/* Section 3: Parent / Guardian Information */}
-          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/70">
-            <div className="flex items-center space-x-2 text-indigo-600 font-semibold text-sm mb-3">
-              <Users className="w-4 h-4" />
-              <h4>Parent / Guardian Details</h4>
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/70 space-y-4">
+            <div>
+              <div className="flex items-center space-x-2 text-indigo-600 font-semibold text-sm mb-3">
+                <Users className="w-4 h-4" />
+                <h4>Emergency / Registration Contact (Legacy Records)</h4>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <span className="text-slate-400 block">Parent Name</span>
+                  <span className="font-semibold text-slate-800">{student.parentName || 'Not provided'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Parent Phone</span>
+                  <span className="font-semibold text-slate-800">{student.parentPhone || 'Not provided'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Parent Email</span>
+                  <span className="font-semibold text-slate-800">{student.parentEmail || 'Not provided'}</span>
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div>
-                <span className="text-slate-400 block">Parent Name</span>
-                <span className="font-semibold text-slate-800">{student.parentName || 'Not provided'}</span>
+
+            {/* Sub-section: Verified Linked Parent Accounts */}
+            <div className="pt-3 border-t border-slate-200">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Linked Parent Accounts ({linkedParents?.length || 0})</span>
+                </div>
+                <Link
+                  to="/academic/parents"
+                  className="text-[11px] text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center space-x-1"
+                >
+                  <span>Manage in Parent Module</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
               </div>
-              <div>
-                <span className="text-slate-400 block">Parent Phone</span>
-                <span className="font-semibold text-slate-800">{student.parentPhone || 'Not provided'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block">Parent Email</span>
-                <span className="font-semibold text-slate-800">{student.parentEmail || 'Not provided'}</span>
-              </div>
+
+              {isLoadingParents ? (
+                <p className="text-xs text-slate-400 py-1">Loading linked parent accounts...</p>
+              ) : !linkedParents || linkedParents.length === 0 ? (
+                <div className="bg-white rounded-lg p-3 border border-slate-200 text-xs text-slate-500 text-center">
+                  No parent account is linked to this student yet. Administrators can link parent accounts in the{' '}
+                  <Link to="/academic/parents" className="text-indigo-600 font-semibold hover:underline">
+                    Parent Management
+                  </Link>{' '}
+                  module.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {linkedParents.map((rel) => {
+                    const p = rel.parent;
+                    const isVerified = rel.status === 'verified';
+                    const isRevoked = rel.status === 'revoked';
+
+                    return (
+                      <div
+                        key={rel._id}
+                        className="bg-white rounded-lg p-2.5 border border-slate-200 flex items-center justify-between text-xs"
+                      >
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-semibold text-slate-900">
+                              {p?.firstName} {p?.lastName}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-medium capitalize px-1.5 py-0.2 bg-slate-100 rounded">
+                              {rel.relationshipType || 'Parent'}
+                            </span>
+                            <span
+                              className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded-full border ${
+                                isVerified
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : isRevoked
+                                  ? 'bg-red-50 text-red-700 border-red-200'
+                                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                              }`}
+                            >
+                              {rel.status}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5">
+                            {p?.email} {p?.phone ? `• ${p?.phone}` : ''}
+                          </div>
+                        </div>
+
+                        {p?._id && (
+                          <Link
+                            to={`/academic/parents/${p._id}`}
+                            className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 rounded transition flex items-center space-x-1"
+                          >
+                            <span>Profile</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

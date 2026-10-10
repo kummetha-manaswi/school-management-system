@@ -8,21 +8,30 @@ const api = axios.create({
   },
 });
 
-// Request interceptor placeholder for attaching JWT token
+// Request interceptor: attach JWT token if present
 api.interceptors.request.use(
   (config) => {
-    // Placeholder: when auth token is implemented, attach Authorization header:
-    // const token = localStorage.getItem('token');
-    // if (token) config.headers.Authorization = `Bearer ${token}`;
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor placeholder for handling global errors
+// Response interceptor: handle 401 unauthorized errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      const isLoginRequest = error.config?.url?.includes('/auth/staff/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('auth:unauthorized'));
+      }
+    }
     return Promise.reject(error);
   }
 );

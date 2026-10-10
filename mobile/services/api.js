@@ -2,14 +2,16 @@
  * Mobile Centralized API Client
  *
  * Configured to connect to the backend REST API.
- * Uses EXPO_PUBLIC_API_URL or defaults to Android emulator loopback / localhost.
+ * Uses dynamic apiConfig base URL resolution.
  */
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5000/api';
+import { getApiBaseUrl } from '../config/apiConfig';
+import parentApi from './parentApi';
 
 export const fetchApiHealth = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/health`);
     if (!response.ok) {
       throw new Error(`Health check returned status ${response.status}`);
     }
@@ -20,7 +22,10 @@ export const fetchApiHealth = async () => {
   }
 };
 
+export { parentApi };
+
 export default {
-  API_BASE_URL,
+  getApiBaseUrl,
   fetchApiHealth,
+  ...parentApi,
 };
